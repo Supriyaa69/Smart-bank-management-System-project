@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <h2>Welcome to Smart Bank</h2>
+
+    <!-- Balance -->
+    <div class="card">
+        <h3>Your Balance</h3>
+        <p id="balance">Loading...</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <button onclick="goToDeposit()">Deposit</button>
+        <button onclick="goToTransfer()">Transfer</button>
+        <button onclick="viewHistory()">Transactions</button>
+        <button onclick="applyLoan()">Loan</button>
+    </div>
+
+    <!-- Logout -->
+    <button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+
+// 🔥 Step 1: Get user from localStorage
+const user = JSON.parse(localStorage.getItem("user"));
+
+// 🔴 Step 2: Check login + role
+if (!user || user.role !== "CUSTOMER") {
+    alert("Access Denied");
+    window.location.href = "login.html";
+}
+
+// ⚠️ TEMP (we will improve later)
+const accountId = user.id;
+
+// 🔷 Load balance
+function loadBalance() {
+    fetch(`http://localhost:8080/account/balance/${accountId}`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("balance").innerText = "₹ " + data;
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById("balance").innerText = "Error loading balance";
+    });
+}
+
+// Call on page load
+loadBalance();
+
+// 🔷 Navigation functions
+function goToDeposit() {
+    window.location.href = "deposit.html";
+}
+
+function goToTransfer() {
+    window.location.href = "transfer.html";
+}
+
+function viewHistory() {
+    window.location.href = "history.html";
+}
+
+function applyLoan() {
+    window.location.href = "loan.html";
+}
+
+// 🔷 Logout
+function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

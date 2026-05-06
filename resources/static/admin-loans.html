@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Loan Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Admin Loan Management</h2>
+
+    <button onclick="loadLoans()">Load All Loans</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="loanTable"></tbody>
+    </table>
+
+</div>
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user || user.role !== "ADMIN") {
+    alert("Access Denied");
+    window.location.href = "login.html";
+}
+</script>
+
+<script>
+
+// Load all loans
+function loadLoans() {
+
+    fetch("http://localhost:8080/loan/all")
+    .then(res => res.json())
+    .then(data => {
+
+        const table = document.getElementById("loanTable");
+        table.innerHTML = "";
+
+        data.forEach(l => {
+
+            const row = `
+                <tr>
+                    <td>${l.id}</td>
+                    <td>${l.user.name}</td>
+                    <td>${l.amount}</td>
+                    <td>${l.status}</td>
+                    <td>
+                        <button onclick="updateStatus(${l.id}, 'APPROVED')">Approve</button>
+                        <button onclick="updateStatus(${l.id}, 'REJECTED')">Reject</button>
+                    </td>
+                </tr>
+            `;
+
+            table.innerHTML += row;
+        });
+    });
+}
+
+// Update status
+function updateStatus(loanId, status) {
+
+    fetch(`http://localhost:8080/loan/update?loanId=${loanId}&status=${status}`, {
+        method: "PUT"
+    })
+    .then(res => res.text())
+    .then(data => {
+        alert(data);
+        loadLoans(); // refresh
+    });
+}
+
+</script>
+
+</body>
+</html>

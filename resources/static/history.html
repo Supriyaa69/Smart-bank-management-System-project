@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transactions</title>
+    <link rel="stylesheet" href="table.css">
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Transaction History</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <button onclick="goBack()">Back</button>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+const accountId = user.id;
+
+fetch(`http://localhost:8080/transaction/history/${accountId}`)
+.then(res => res.json())
+.then(data => {
+    const table = document.getElementById("tableBody");
+
+    data.forEach(t => {
+        const row = `
+            <tr>
+                <td>${t.id}</td>
+                <td>${t.type}</td>
+                <td>${t.amount}</td>
+                <td>${t.date}</td>
+            </tr>
+        `;
+        table.innerHTML += row;
+    });
+});
+
+function goBack() {
+    window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>

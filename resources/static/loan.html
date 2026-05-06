@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan</title>
+    <link rel="stylesheet" href="loan.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Loan Section</h2>
+
+    <!-- Apply Loan -->
+    <div class="card">
+        <h3>Apply for Loan</h3>
+
+        <form id="loanForm">
+            <input type="number" id="amount" placeholder="Enter Loan Amount" required>
+            <button type="submit">Apply Loan</button>
+        </form>
+
+        <p id="message"></p>
+    </div>
+
+    <!-- View Loans -->
+    <div class="card">
+        <h3>Your Loan Status</h3>
+        <button onclick="loadLoans()">View Loans</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="loanTable"></tbody>
+        </table>
+    </div>
+
+    <button class="back" onclick="goBack()">Back</button>
+
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+const userId = user.id;
+
+// Apply Loan
+document.getElementById("loanForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const amount = document.getElementById("amount").value;
+
+    fetch("http://localhost:8080/loan/apply", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            userId: userId,
+            amount: amount
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("message").innerText = data;
+    });
+});
+
+// View Loans
+function loadLoans() {
+    fetch(`http://localhost:8080/loan/user/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById("loanTable");
+        table.innerHTML = "";
+
+        data.forEach(l => {
+            const row = `
+                <tr>
+                    <td>${l.id}</td>
+                    <td>${l.amount}</td>
+                    <td>${l.status}</td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    });
+}
+
+// Back
+function goBack() {
+    window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>
